@@ -17,7 +17,7 @@ final class DashboardViewModel {
         }
         selectedVehicle = vehicle
         
-        let records = (vehicle.records ?? []).sorted { $0.date > $1.date }
+        let records = (vehicle.records).sorted { $0.date > $1.date }
         latestEfficiency = FuelCalculationService.latestFuelEfficiency(records: records)
         currentMonthCost = FuelCalculationService.currentMonthTotalCost(records: records)
         let sortedByOdo = records.sorted { $0.odometer < $1.odometer }

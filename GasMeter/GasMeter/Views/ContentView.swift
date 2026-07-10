@@ -55,7 +55,7 @@ struct ContentView: View {
     
     private func refreshStatistics() {
         if let vehicle = dashboardVM.selectedVehicle ?? vehicles.first {
-            statisticsVM.refresh(records: vehicle.records ?? [])
+            statisticsVM.refresh(records: vehicle.records)
         }
     }
 }

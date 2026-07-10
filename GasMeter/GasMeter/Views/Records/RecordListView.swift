@@ -14,7 +14,7 @@ struct RecordListView: View {
     
     private var records: [FuelRecord] {
         guard let vehicle = dashboardVM.selectedVehicle else { return [] }
-        return (vehicle.records ?? []).sorted { $0.date > $1.date }
+        return (vehicle.records).sorted { $0.date > $1.date }
     }
     
     var body: some View {

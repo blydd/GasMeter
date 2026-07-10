@@ -13,9 +13,8 @@ final class FuelRecord {
     var notes: String
     var createdAt: Date
     
-    @Relationship(inverse: \Vehicle.records)
+    // 关联车辆（父端已定义 inverse）
     var vehicle: Vehicle?
-    
     /// 总金额 — @Transient 不持久化，始终实时计算
     @Transient
     var totalCost: Double {

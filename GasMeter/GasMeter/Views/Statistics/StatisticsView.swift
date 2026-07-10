@@ -108,9 +108,9 @@ struct StatisticsView: View {
     private func refresh() {
         let records: [FuelRecord]
         if let vehicle = dashboardVM.selectedVehicle {
-            records = vehicle.records ?? []
+            records = vehicle.records
         } else if let first = vehicles.first {
-            records = first.records ?? []
+            records = first.records
         } else {
             records = []
         }
