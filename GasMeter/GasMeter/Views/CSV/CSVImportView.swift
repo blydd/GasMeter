@@ -167,9 +167,13 @@ struct CSVImportView: View {
         .padding(.top, 40)
     }
     
-    private func handleFileImport(_ result: Result<URL, Error>) {
+    private func handleFileImport(_ result: Result<[URL], Error>) {
         switch result {
-        case .success(let url):
+        case .success(let urls):
+            guard let url = urls.first else {
+                importError = "未选择文件"
+                return
+            }
             guard url.startAccessingSecurityScopedResource() else {
                 importError = "无法访问文件"
                 return
@@ -193,7 +197,7 @@ struct CSVImportView: View {
     
     private func performImport() {
         var imported = 0
-        var skipped = 0
+        let skipped = 0
         
         for parsed in parsedRecords {
             let targetVehicle: Vehicle
