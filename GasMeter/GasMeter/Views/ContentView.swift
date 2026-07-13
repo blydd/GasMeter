@@ -46,17 +46,10 @@ struct ContentView: View {
         .onChange(of: vehicles.count) {
             vehicleManagementVM.refresh(context: modelContext)
             dashboardVM.refresh(with: modelContext, allVehicles: vehicles)
-            refreshStatistics()
         }
         .environment(dashboardVM)
         .environment(statisticsVM)
         .environment(vehicleManagementVM)
-    }
-    
-    private func refreshStatistics() {
-        if let vehicle = dashboardVM.selectedVehicle ?? vehicles.first {
-            statisticsVM.refresh(records: vehicle.records)
-        }
     }
 }
 

@@ -1,19 +1,32 @@
 import SwiftUI
 import SwiftData
 
+/// 统计页车辆切页模式
+enum StatisticsTab: Hashable {
+    case all
+    case vehicle(UUID)
+}
+
 struct StatisticsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(DashboardViewModel.self) private var dashboardVM
     @Environment(StatisticsViewModel.self) private var statisticsVM
     @Query(sort: \Vehicle.createdAt) private var vehicles: [Vehicle]
     
+    @State private var selectedTab: StatisticsTab = .all
+    
     var body: some View {
         NavigationStack {
             ScrollView {
-                if dashboardVM.selectedVehicle == nil && vehicles.isEmpty {
+                if vehicles.isEmpty {
                     emptyStateView
                 } else {
                     VStack(spacing: 20) {
+                        // 车辆切页选择器（仅多车时显示）
+                        if vehicles.count > 1 {
+                            vehicleTabPicker
+                        }
+                        
                         // 累计统计卡片
                         cumulativeStatsCard
                         
@@ -33,8 +46,45 @@ struct StatisticsView: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle("统计")
             .onAppear { refresh() }
-            .onChange(of: dashboardVM.selectedVehicle?.id) { refresh() }
-            .onChange(of: dashboardVM.recentRecords.count) { refresh() }
+            .onChange(of: selectedTab) { refresh() }
+            .onChange(of: vehicles.flatMap { $0.records }.count) { refresh() }
+            .onChange(of: vehicles.count) { oldCount, newCount in
+                // 车辆被删除时重置到全部
+                if case .vehicle(let id) = selectedTab, !vehicles.contains(where: { $0.id == id }) {
+                    selectedTab = .all
+                }
+                refresh()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var vehicleTabPicker: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                tabButton(title: "全部", isSelected: selectedTab == .all) {
+                    selectedTab = .all
+                }
+                ForEach(vehicles) { vehicle in
+                    tabButton(title: vehicle.name, isSelected: selectedTab == .vehicle(vehicle.id)) {
+                        selectedTab = .vehicle(vehicle.id)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+    
+    private func tabButton(title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(isSelected ? .semibold : .regular)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(isSelected ? Color.orange : Color(.systemGray5))
+                .foregroundColor(isSelected ? .white : .primary)
+                .clipShape(Capsule())
         }
     }
     
@@ -107,12 +157,11 @@ struct StatisticsView: View {
     
     private func refresh() {
         let records: [FuelRecord]
-        if let vehicle = dashboardVM.selectedVehicle {
-            records = vehicle.records
-        } else if let first = vehicles.first {
-            records = first.records
-        } else {
-            records = []
+        switch selectedTab {
+        case .all:
+            records = vehicles.flatMap { $0.records }
+        case .vehicle(let id):
+            records = vehicles.first(where: { $0.id == id })?.records ?? []
         }
         statisticsVM.refresh(records: records)
     }
