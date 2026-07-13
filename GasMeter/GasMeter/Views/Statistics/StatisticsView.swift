@@ -17,33 +17,35 @@ struct StatisticsView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
+            Group {
                 if vehicles.isEmpty {
                     emptyStateView
                 } else {
-                    VStack(spacing: 20) {
-                        // 车辆切页选择器（仅多车时显示）
-                        if vehicles.count > 1 {
-                            vehicleTabPicker
+                    ScrollView {
+                        VStack(spacing: 20) {
+                            // 车辆切页选择器（仅多车时显示）
+                            if vehicles.count > 1 {
+                                vehicleTabPicker
+                            }
+                            
+                            // 累计统计卡片
+                            cumulativeStatsCard
+                            
+                            // 月度油耗趋势
+                            chartSection(title: "月度油耗趋势 (L/100km)", subtitle: "近6个月") {
+                                MonthlyEfficiencyChart(data: statisticsVM.monthlyEfficiencyData)
+                            }
+                            
+                            // 月度油费
+                            chartSection(title: "月度油费 (元)", subtitle: "近6个月") {
+                                MonthlyCostChart(data: statisticsVM.monthlyCostData)
+                            }
                         }
-                        
-                        // 累计统计卡片
-                        cumulativeStatsCard
-                        
-                        // 月度油耗趋势
-                        chartSection(title: "月度油耗趋势 (L/100km)", subtitle: "近6个月") {
-                            MonthlyEfficiencyChart(data: statisticsVM.monthlyEfficiencyData)
-                        }
-                        
-                        // 月度油费
-                        chartSection(title: "月度油费 (元)", subtitle: "近6个月") {
-                            MonthlyCostChart(data: statisticsVM.monthlyCostData)
-                        }
+                        .padding(.vertical)
                     }
-                    .padding(.vertical)
+                    .background(Color(.systemGroupedBackground))
                 }
             }
-            .background(Color(.systemGroupedBackground))
             .navigationTitle("统计")
             .onAppear { refresh() }
             .onChange(of: selectedTab) { refresh() }
@@ -140,19 +142,20 @@ struct StatisticsView: View {
     }
     
     private var emptyStateView: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "chart.bar.xaxis")
-                .font(.system(size: 50))
-                .foregroundColor(.secondary.opacity(0.4))
-            Text("暂无统计数据")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            Text("添加车辆并记录加油数据后\n将在此显示统计图表")
-                .font(.caption)
-                .foregroundColor(.secondary.opacity(0.7))
-                .multilineTextAlignment(.center)
-        }
-        .padding(.top, 100)
+        Color(.systemGroupedBackground).overlay(
+            VStack(spacing: 12) {
+                Image(systemName: "chart.bar.xaxis")
+                    .font(.system(size: 50))
+                    .foregroundColor(.secondary.opacity(0.4))
+                Text("暂无统计数据")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Text("添加车辆并记录加油数据后\n将在此显示统计图表")
+                    .font(.caption)
+                    .foregroundColor(.secondary.opacity(0.7))
+                    .multilineTextAlignment(.center)
+            }
+        )
     }
     
     private func refresh() {
