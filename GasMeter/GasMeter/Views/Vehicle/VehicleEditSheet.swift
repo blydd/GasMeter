@@ -13,6 +13,7 @@ struct VehicleEditSheet: View {
     @State private var model: String = ""
     @State private var licensePlate: String = ""
     @State private var fuelType: String = "92#"
+    @State private var tankCapacity: String = ""
     @State private var saveError: String?
     @State private var showSaveError = false
     
@@ -64,6 +65,17 @@ struct VehicleEditSheet: View {
                         Text("98#").tag("98#")
                         Text("0#（柴油）").tag("0#")
                     }
+                    
+                    HStack {
+                        Text("油箱容量")
+                        Spacer()
+                        TextField("选填", text: $tankCapacity)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(width: 100)
+                        Text("L")
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
             .navigationTitle(isEditing ? "编辑车辆" : "添加车辆")
@@ -95,6 +107,7 @@ struct VehicleEditSheet: View {
                     model = v.model
                     licensePlate = v.licensePlate
                     fuelType = v.fuelType
+                    tankCapacity = v.tankCapacity.map { String(format: "%.0f", $0) } ?? ""
                 }
             }
         }
@@ -111,6 +124,7 @@ struct VehicleEditSheet: View {
             existing.model = model
             existing.licensePlate = licensePlate
             existing.fuelType = fuelType
+            existing.tankCapacity = Double(tankCapacity)
         } else {
             let newVehicle = Vehicle(
                 name: trimmed,
@@ -118,7 +132,8 @@ struct VehicleEditSheet: View {
                 brand: brand,
                 model: model,
                 licensePlate: licensePlate,
-                fuelType: fuelType
+                fuelType: fuelType,
+                tankCapacity: Double(tankCapacity)
             )
             modelContext.insert(newVehicle)
         }

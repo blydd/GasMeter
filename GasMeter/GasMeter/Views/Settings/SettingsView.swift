@@ -13,6 +13,9 @@ struct SettingsView: View {
     @State private var showClearAlert = false
     @State private var importResult: String?
     @State private var showImportResult = false
+    @AppStorage("userNickname") private var userNickname: String = "油耗记用户"
+    @State private var isEditingName = false
+    @State private var editingName: String = ""
     
     var body: some View {
         NavigationStack {
@@ -23,8 +26,28 @@ struct SettingsView: View {
                             .font(.title2)
                             .foregroundColor(.orange)
                         VStack(alignment: .leading) {
-                            Text("油耗记用户")
+                            if isEditingName {
+                                TextField("输入昵称", text: $editingName, onCommit: {
+                                    userNickname = editingName
+                                    isEditingName = false
+                                })
                                 .font(.headline)
+                                .textFieldStyle(.plain)
+                            } else {
+                                Button {
+                                    editingName = userNickname
+                                    isEditingName = true
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        Text(userNickname)
+                                            .font(.headline)
+                                        Image(systemName: "pencil")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                            }
                             Text("\(vehicles.count) 辆车")
                                 .font(.caption)
                                 .foregroundColor(.secondary)

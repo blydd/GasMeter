@@ -7,6 +7,7 @@ struct VehicleListView: View {
     
     @State private var showAddSheet = false
     @State private var editVehicle: Vehicle?
+    @State private var showEditSheet = false
     @State private var showDeleteAlert = false
     @State private var deleteTarget: Vehicle?
     @State private var deleteError: String?
@@ -37,7 +38,7 @@ struct VehicleListView: View {
                     ForEach(vehicles) { vehicle in
                         Button {
                             editVehicle = vehicle
-                            showAddSheet = true
+                            showEditSheet = true
                         } label: {
                             HStack(spacing: 14) {
                                 Image(systemName: vehicle.type.iconName)
@@ -105,6 +106,9 @@ struct VehicleListView: View {
             }
         }
         .sheet(isPresented: $showAddSheet) {
+            VehicleEditSheet(vehicle: nil)
+        }
+        .sheet(isPresented: $showEditSheet) {
             VehicleEditSheet(vehicle: editVehicle)
         }
         .alert("确认删除", isPresented: $showDeleteAlert) {

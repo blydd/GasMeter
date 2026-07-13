@@ -31,6 +31,7 @@ final class Vehicle {
     var year: Int?
     var licensePlate: String
     var fuelType: String
+    var tankCapacity: Double?  // 油箱容量（L），可选
     var createdAt: Date
     
     /// 计算属性桥接枚举
@@ -50,6 +51,7 @@ final class Vehicle {
         year: Int? = nil,
         licensePlate: String = "",
         fuelType: String = "92#",
+        tankCapacity: Double? = nil,
         createdAt: Date = Date()
     ) {
         self.id = UUID()
@@ -60,6 +62,7 @@ final class Vehicle {
         self.year = year
         self.licensePlate = licensePlate
         self.fuelType = fuelType
+        self.tankCapacity = tankCapacity
         self.createdAt = createdAt
     }
 }
